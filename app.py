@@ -3,7 +3,6 @@ from extensions import db, bcrypt, jwt
 from models import User, Post, TokenBlockList, Comment, Like
 from flask_jwt_extended import JWTManager
 
-
 from routes.auth_routes import auth_bp
 from routes.post_routes import post_bp
 from routes.comment_routes import comment_bp
@@ -112,6 +111,9 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 db.init_app(app)
 bcrypt.init_app(app)
 jwt.init_app(app)
+
+from flask_migrate import Migrate
+migrate = Migrate(app, db)
 
 with app.app_context():
     from flask_migrate import upgrade
