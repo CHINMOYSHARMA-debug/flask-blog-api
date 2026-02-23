@@ -94,7 +94,12 @@ uri = os.getenv("DATABASE_URL")
 if uri and uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = uri or "sqlite:///site.db"
+if not uri:
+    raise ValueError("DATABASE_URL is not set!")
+
+print("USING DB:", uri)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = uri
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
@@ -116,7 +121,7 @@ jwt.init_app(app)
 
 with app.app_context():
     db.create_all()
-    
+
 #Token Revocation Checker
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
