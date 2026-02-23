@@ -108,10 +108,14 @@ from datetime import timedelta
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 
-# Extensions initialize
+#Extensions initialize
 db.init_app(app)
 bcrypt.init_app(app)
 jwt.init_app(app)
+
+with app.app_context():
+    from flask_migrate import upgrade
+    upgrade()
 
 #Token Revocation Checker
 @jwt.token_in_blocklist_loader
