@@ -10,8 +10,10 @@ from routes.like_routes import like_bp
 from routes.user_routes import user_bp
 from utils.responses import error_response
 from flasgger import Swagger
+from flask_migrate import Migrate
 
 app = Flask(__name__)
+migrate = Migrate(app, db)
 
 swagger_config = {
     "headers" : [],
@@ -111,9 +113,6 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 db.init_app(app)
 bcrypt.init_app(app)
 jwt.init_app(app)
-
-from flask_migrate import Migrate
-migrate = Migrate(app, db)
 
 with app.app_context():
     from flask_migrate import upgrade
