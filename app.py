@@ -115,9 +115,8 @@ bcrypt.init_app(app)
 jwt.init_app(app)
 
 with app.app_context():
-    from flask_migrate import upgrade
-    upgrade()
-
+    db.create_all()
+    
 #Token Revocation Checker
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
