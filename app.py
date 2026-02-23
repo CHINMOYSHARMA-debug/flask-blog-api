@@ -112,6 +112,7 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 db.init_app(app)
 bcrypt.init_app(app)
 jwt.init_app(app)
+
 #Token Revocation Checker
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
@@ -129,7 +130,7 @@ app.register_blueprint(user_bp)
 
 Swagger(app, config=swagger_config, template=swagger_template)
 
-with app.app_context():
-    db.create_all()
-
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
