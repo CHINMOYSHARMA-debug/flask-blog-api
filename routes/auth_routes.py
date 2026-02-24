@@ -19,12 +19,6 @@ def register():
     print("STEP 1: Request received")
     data = request.get_json()
 
-    @auth_bp.route("/reset-db")
-    def reset_db():
-        db.drop_all()
-        db.create_all()
-        return "DB reset done"
-
     if data is None:
         return error_response("Request body must be JSON", 400)
     if not data.get("username"):
