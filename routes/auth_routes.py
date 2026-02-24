@@ -25,11 +25,17 @@ def register():
         return error_response("Username is required", 400)
     if not data.get("password"):
         return error_response("Password is required", 400)
-
-    # Check if user already exists
+    if not data.get("email"):
+        return error_response("Email is required", 400)
+     
+    #  Check if user already exists
     existing_user = User.query.filter_by(username=data["username"]).first()
     if existing_user:
         return error_response("Username already exists", 400)
+    
+    existing_mail = User.query.filter_by(email=data["data"]).first()
+    if existing_mail:
+        return error_response("Email already exists", 400)
 
     hashed_password = bcrypt.generate_password_hash(
         data["password"]
@@ -37,6 +43,7 @@ def register():
 
     new_user = User(
         username=data["username"],
+        email=data["email"],
         password=hashed_password
     )
 
