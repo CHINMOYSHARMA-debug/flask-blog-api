@@ -13,7 +13,6 @@ from utils.responses import error_response, success_response
 
 auth_bp = Blueprint("auth", __name__)
 
-
 # REGISTER
 @auth_bp.route("/register", methods=["POST"])
 def register():
@@ -25,7 +24,7 @@ def register():
         db.drop_all()
         db.create_all()
         return "DB reset done"
-    
+
     if data is None:
         return error_response("Request body must be JSON", 400)
     if not data.get("username"):
@@ -65,7 +64,7 @@ def register():
     print("STEP 7: DB commit done")
     
     return success_response(
-        message="User created",
+        message="User created New Version",
     ), 201
 
 
