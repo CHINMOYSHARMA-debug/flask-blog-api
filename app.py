@@ -19,6 +19,10 @@ migrate = Migrate(app, db)
 def home():
     return "OK"
 
+@app.route("/test-route")
+def test_route():
+    return "WORKING"
+
 swagger_config = {
     "headers" : [],
     "specs" : [
