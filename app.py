@@ -15,6 +15,10 @@ from flask_migrate import Migrate
 app = Flask(__name__)
 migrate = Migrate(app, db)
 
+@app.route("/")
+def home():
+    return "OK"
+
 swagger_config = {
     "headers" : [],
     "specs" : [
@@ -96,6 +100,9 @@ if uri and uri.startswith("postgres://"):
 
 if not uri:
     raise ValueError("DATABASE_URL is not set!")
+
+if "sslmode" not in uri:
+    uri += "?sslmode=require"
 
 print("USING DB:", uri)
 
