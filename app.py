@@ -23,12 +23,6 @@ def home():
 def test_route():
     return "WORKING"
 
-@app.route("/reset-db")
-def reset_db():
-    db.drop_all()
-    db.create_all()
-    return "DB reset done"
-
 swagger_config = {
     "headers" : [],
     "specs" : [
