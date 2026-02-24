@@ -33,7 +33,7 @@ def register():
     if existing_user:
         return error_response("Username already exists", 400)
     
-    existing_mail = User.query.filter_by(email=data["data"]).first()
+    existing_mail = User.query.filter_by(email=data["email"]).first()
     if existing_mail:
         return error_response("Email already exists", 400)
 
