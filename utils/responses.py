@@ -1,15 +1,15 @@
 from flask import jsonify
 
 def success_response(message="Success", status_code=200, data=None):
-    response = {
+    res = {
         "success": True,
-        "message": message,
+        "message": message
     }
 
     if data:
-        response["data"] = data
+        res["data"] = data
     
-    return jsonify(response), status_code
+    return jsonify(res), status_code
 
 
 def error_response(message="Error", status_code=400):

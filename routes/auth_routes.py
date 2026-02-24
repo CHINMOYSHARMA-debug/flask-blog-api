@@ -57,10 +57,7 @@ def register():
     db.session.commit()
     print("STEP 7: DB commit done")
     
-    return {
-        "success": True,
-        "message": "User created"
-    }, 201
+    return success_response("User created", 201)
 
 
 # LOGIN
