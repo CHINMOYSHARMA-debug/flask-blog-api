@@ -80,11 +80,13 @@ def login():
     access_token = create_access_token(identity=str(user.id))
     refresh_token = create_refresh_token(identity=str(user.id))
 
-    return success_response({
-        "access_token": access_token,
-        "refresh_token": refresh_token
-    })
-
+    return success_response(
+        message="Login successful",
+        data={
+            "access token": access_token,
+            "refresh_token": refresh_token
+        }
+    ), 200
 
 # LOGOUT (token revocation)
 @auth_bp.route("/logout", methods=["POST"])
