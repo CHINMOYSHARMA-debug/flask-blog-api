@@ -86,7 +86,7 @@ def login():
             "access token": access_token,
             "refresh_token": refresh_token
         }
-    ), 200
+    )
 
 # LOGOUT (token revocation)
 @auth_bp.route("/logout", methods=["POST"])
