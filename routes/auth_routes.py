@@ -45,8 +45,7 @@ def register():
 
     return success_response(
         message="User created",
-        status=201
-    )
+    ), 201
 
 
 # LOGIN
