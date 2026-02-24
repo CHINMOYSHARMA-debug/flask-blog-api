@@ -14,9 +14,6 @@ from flask_migrate import Migrate
 
 app = Flask(__name__)
 migrate = Migrate(app, db)
-with app.app_context():
-    db.drop_all()
-    db.create_all()
 
 @app.route("/")
 def home():
@@ -128,6 +125,9 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 db.init_app(app)
 bcrypt.init_app(app)
 jwt.init_app(app)
+with app.app_context():
+    db.drop_all()
+    db.create_all()
 
 with app.app_context():
     db.create_all()
