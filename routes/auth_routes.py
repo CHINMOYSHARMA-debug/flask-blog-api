@@ -116,10 +116,14 @@ def get_me():
     if not user:
         abort(404)
 
-    return success_response({
-        "id": user.id,
-        "username": user.username
-    })
+    return success_response(
+        message="User fetched",
+        data={
+            "id": user.id,
+            "username": user.username,
+            "email": user.email   
+        }
+    )
 
 
 # REFRESH TOKEN
