@@ -61,6 +61,12 @@ swagger_template = {
 
 jwt = JWTManager(app)
 
+@jwt.token_in_blocklist_loader
+def check_in_token_revoked(jwt_header, jwt_payload):
+    jti = jwt_payload["jti"]
+    token = TokenBlockList.query.filter_by(jti=jti).first()
+    return token is not None
+
 @jwt.expired_token_loader
 def expired_token_callback(jwt_header, jwt_payload):
     return error_response("Token has expired", 401)
