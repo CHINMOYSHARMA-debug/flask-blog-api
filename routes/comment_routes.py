@@ -34,7 +34,10 @@ def add_comment(post_id):
     db.session.add(new_comment)
     db.session.commit()
 
-    return {"message":"ok"}, 201
+    return success_response(
+        message="Comment added successfully",
+        data=new_comment.to_dict()
+    ), 201
 
 # GET COMMENTS FOR POST
 @comment_bp.route("/posts/<int:post_id>/comments", methods=["GET"])
