@@ -26,16 +26,19 @@ def get_posts():
 
     posts = [post.to_dict() for post in pagination.items]
 
-    return success_response({
-        "items": posts,
-        "pagination": {
+    return success_response(
+        message="Posts fetched",
+        data={
+            "items": posts,
+            "pagination": {
             "total": pagination.total,
             "pages": pagination.pages,
             "current_page": pagination.page,
             "has_next": pagination.has_next,
             "has_prev": pagination.has_prev
         }
-    })
+    }
+)
 
 # GET MY POSTS
 @post_bp.route("/my-posts", methods=["GET"])
