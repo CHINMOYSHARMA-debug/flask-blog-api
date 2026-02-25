@@ -27,7 +27,7 @@ def add_comment(post_id):
 
     new_comment = Comment(
         text=text,
-        user_id=user_id,
+        author_id=user_id,
         post_id=post_id
     )
 
