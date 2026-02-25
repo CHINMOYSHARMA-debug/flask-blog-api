@@ -30,9 +30,8 @@ def like_post(post_id):
     db.session.commit()
 
     return success_response(
-        message="Post liked",
-        status=201
-    )
+        message="Post liked"
+    ), 201
 
 
 # UNLIKE POST
@@ -66,7 +65,10 @@ def get_likes_count(post_id):
 
     likes_count = Like.query.filter_by(post_id=post_id).count()
 
-    return success_response({
-        "post_id": post_id,
-        "likes": likes_count
-    })
+    return success_response(
+        message="Likes fetched",
+        data={
+            "post_id": post_id,
+            "likes": likes_count
+        }
+    )
