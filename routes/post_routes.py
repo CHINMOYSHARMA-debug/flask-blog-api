@@ -133,15 +133,17 @@ def create_post():
     db.session.add(new_post)
     db.session.commit()
 
-    return success_response({
-        "id": new_post.id,
-        "title": new_post.title,
-        "content": new_post.content,
-        "author_id": new_post.author_id
-    }, 201)
+    return success_response(
+        message="Post created",
+        data={
+            "id": new_post.id,
+            "title": new_post.title,
+            "content": new_post.content,
+            "author_id": new_post.author_id
+        }
+    )
 
 # GET SINGLE POST
-
 @post_bp.route("/posts/<int:post_id>", methods=["GET"])
 def get_post(post_id):
     post = db.session.get(Post, post_id)
