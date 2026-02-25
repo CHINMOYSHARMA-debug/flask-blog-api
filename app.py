@@ -17,11 +17,15 @@ migrate = Migrate(app, db)
 
 @app.route("/")
 def home():
-    return "OK"
-
-@app.route("/test-route")
-def test_route():
-    return "WORKING"
+    return {
+        "message": "Flask Blog API is running",
+        "docs": "/docs (if using swagger)",
+        "endpoints": [
+            "/register",
+            "/login",
+            "/posts"
+        ]
+    }
 
 swagger_config = {
     "headers" : [],
