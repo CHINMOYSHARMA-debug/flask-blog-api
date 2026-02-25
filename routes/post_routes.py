@@ -154,10 +154,10 @@ def get_post(post_id):
     if not post:
         abort(404)
 
-    return success_response({
-        "item": post.to_dict()
-    })
-
+    return success_response(
+        message="Post fetched",
+        data=post.to_dict()
+    )
 # UPDATE POST
 @post_bp.route("/posts/<int:post_id>", methods=["PUT"])
 @jwt_required()
@@ -173,7 +173,6 @@ def update_post(post_id):
     if not post:
         abort(404)
 
-    # OWNERSHIP CHECK
     if post.author_id != user_id:
         abort(403)
 
@@ -185,10 +184,10 @@ def update_post(post_id):
 
     db.session.commit()
 
-    return success_response({
-        "message": "Post updated",
-        "data": post.to_dict()
-    })
+    return success_response(
+        message = "Post updated",
+        data = post.to_dict()
+    )
 
 # DELETE POST
 @post_bp.route("/posts/<int:post_id>", methods=["DELETE"])
@@ -207,6 +206,6 @@ def delete_post(post_id):
     db.session.delete(post)
     db.session.commit()
 
-    return success_response({
-        "message": "Post deleted"
-    })
+    return success_response(
+        message =  "Post deleted"
+    )
