@@ -16,7 +16,6 @@ auth_bp = Blueprint("auth", __name__)
 # REGISTER
 @auth_bp.route("/register", methods=["POST"])
 def register():
-    print("STEP 1: Request received")
     data = request.get_json(force=True)
 
     if data is None:
@@ -28,15 +27,12 @@ def register():
     if not data.get("email"):
         return error_response("Email is required", 400)
      
-    print("STEP 2: Validation passed")
     existing_user = User.query.filter_by(username=data["username"]).first()
-    print("STEP 3: Username query done")
     
     if existing_user:
         return error_response("Username already exists", 400)
     
     existing_mail = User.query.filter_by(email=data["email"]).first()
-    print("STEP 4: Email query done")
 
     if existing_mail:
         return error_response("Email already exists", 400)
@@ -44,7 +40,6 @@ def register():
     hashed_password = bcrypt.generate_password_hash(
         data["password"]
     ).decode("utf-8")
-    print("STEP 5: Password hashed")
 
     new_user = User(
         username=data["username"],
@@ -53,10 +48,7 @@ def register():
     )
 
     db.session.add(new_user)
-    print("STEP 6: User added to session")
     db.session.commit()
-    print("STEP 7: DB commit done")
-    
     return success_response("User created", 201)
 
 
@@ -115,7 +107,6 @@ def get_me():
 
     if not user:
         abort(404)
-
     return success_response(
         message="User fetched",
         data={
@@ -124,7 +115,6 @@ def get_me():
             "email": user.email   
         }
     )
-
 
 # REFRESH TOKEN
 @auth_bp.route("/refresh", methods=["POST"])
@@ -136,7 +126,6 @@ def refresh():
     return success_response({
         "access_token": new_access_token
     })
-
 
 # CHANGE PASSWORD
 @auth_bp.route("/change-password", methods=["PUT"])

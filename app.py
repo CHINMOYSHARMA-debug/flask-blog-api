@@ -23,12 +23,6 @@ def home():
 def test_route():
     return "WORKING"
 
-@app.route("/reset-db", methods=["GET"])
-def reset_db():
-    db.drop_all()
-    db.create_all()
-    return "DB reset done"
-
 swagger_config = {
     "headers" : [],
     "specs" : [
@@ -101,7 +95,7 @@ def forbidden(e):
 def server_error(e):
     return error_response("Internal server response", 500)
 
-# Config
+#config
 import os
 from dotenv import load_dotenv
 
@@ -141,7 +135,7 @@ from datetime import timedelta
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 
-#Extensions initialize
+#Extensions init
 db.init_app(app)
 bcrypt.init_app(app)
 jwt.init_app(app)
@@ -150,7 +144,7 @@ jwt.init_app(app)
 with app.app_context():
     db.create_all()
 
-#Token Revocation Checker
+#Token Revocation
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
     jti = jwt_payload["jti"]  # unique token id
