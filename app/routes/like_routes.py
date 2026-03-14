@@ -1,8 +1,8 @@
 from flask import Blueprint, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import Like, Post
-from extensions import db
-from utils.responses import error_response, success_response
+from app.models import Like, Post
+from app.extensions import db
+from app.utils.responses import error_response, success_response
 
 like_bp = Blueprint("likes", __name__)
 
@@ -30,9 +30,9 @@ def like_post(post_id):
     db.session.commit()
 
     return success_response(
-        message="Post liked"
-    ), 201
-
+        message="Post liked",
+        status_code=201
+    )
 
 # UNLIKE POST
 @like_bp.route("/posts/<int:post_id>/like", methods=["DELETE"])

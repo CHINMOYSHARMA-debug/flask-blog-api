@@ -1,73 +1,64 @@
 from flask import Blueprint, request, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import Post
-from extensions import db
-from utils.responses import success_response, error_response
+from app.models import Post, db
+from app.extensions import db
+from app.utils.responses import success_response, error_response
+from app.services import post_service
 
 post_bp = Blueprint("posts", __name__)
 
 # GET ALL POSTS (Pagination + Search)
 @post_bp.route("/posts", methods=["GET"])
 def get_posts():
+    
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 5, type=int)
     search = request.args.get("search", "", type=str)
-
+    sort = request.args.get("sort", "new", type=str)
+    
     query = Post.query
 
-    if search:
+    if search: #searching
         query = query.filter(Post.title.ilike(f"%{search}%"))
 
-    pagination = query.order_by(Post.id.desc()).paginate(
+    if sort == "old":
+        query = query.order_by(Post.id.asc())
+    else:
+        query = query.order_by(Post.created_at.desc())
+
+    pagination = query.paginate(
         page=page,
         per_page=per_page,
         error_out=False
     )
-
+    
     posts = [post.to_dict() for post in pagination.items]
-
     return success_response(
         message="Posts fetched",
         data={
             "items": posts,
-            "pagination": {
             "total": pagination.total,
             "pages": pagination.pages,
             "current_page": pagination.page,
             "has_next": pagination.has_next,
             "has_prev": pagination.has_prev
         }
-    }
-)
+    )
 
 # GET MY POSTS
 @post_bp.route("/my-posts", methods=["GET"])
 @jwt_required()
 def get_my_posts():
-    user_id = int(get_jwt_identity())
+    user_id = get_jwt_identity()
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 5, type=int)
     search = request.args.get("search", "", type=str)
 
-    query = Post.query.filter_by(author_id=user_id)
-
-    if search:
-        query = query.filter(
-            Post.title.ilike(f"%{search}%") |
-            Post.content.ilike(f"%{search}%")
-        )
-
-    pagination = query.order_by(Post.id.desc()).paginate(
-        page=page,
-        per_page=per_page,
-        error_out=False
-    )
-
-    posts = [post.to_dict() for post in pagination.items]
+    posts, pagination = post_service.get_my_posts(page, per_page, search, user_id)
 
     return success_response({
-        "items": posts,
+        "items": [post.to_dict() for post in posts],
         "pagination": {
             "total": pagination.total,
             "pages": pagination.pages,
@@ -116,48 +107,51 @@ def create_post():
       401:
         description: Unauthorized
     """
+    try:
+        user_id = int(get_jwt_identity())
+        data = request.get_json()
 
-    user_id = int(get_jwt_identity())
-    data = request.get_json()
+        if data is None:
+            return error_response("Request body must be JSON", 400)
+        if not data.get("title"):
+            return error_response("Title is required", 400)
+        if not data.get("content"):
+            return error_response("Content is required", 400)
 
-    if data is None:
-        return error_response("Request body must be JSON", 400)
-    if not data.get("title"):
-        return error_response("Title is required", 400)
-    if not data.get("content"):
-        return error_response("Content is required", 400)
+        new_post = post_service.create_post(
+            user_id,
+            data.get("title"),
+            data.get("content")
+        )
 
-    new_post = Post(
-        title=data["title"],
-        content=data["content"],
-        author_id=user_id
-    )
+        return success_response(
+            message="Post created",
+            data={
+                "id": new_post.id,
+                "title": new_post.title,
+                "content": new_post.content,
+                "author_id": new_post.author_id,
+            },
+            status_code=201
+        )
 
-    db.session.add(new_post)
-    db.session.commit()
-
-    return success_response(
-        message="Post created",
-        data={
-            "id": new_post.id,
-            "title": new_post.title,
-            "content": new_post.content,
-            "author_id": new_post.author_id
-        }
-    )
+    except Exception as e:
+        print("ERROR:", e)
+        return error_response("Internal error", 500)
 
 # GET SINGLE POST
 @post_bp.route("/posts/<int:post_id>", methods=["GET"])
 def get_post(post_id):
-    post = db.session.get(Post, post_id)
+    post = Post.query.get(post_id)
 
     if not post:
-        abort(404)
+        return error_response("Post not found", 404)
 
     return success_response(
         message="Post fetched",
         data=post.to_dict()
     )
+
 # UPDATE POST
 @post_bp.route("/posts/<int:post_id>", methods=["PUT"])
 @jwt_required()
@@ -167,22 +161,16 @@ def update_post(post_id):
 
     if data is None:
         return error_response("Request body must be JSON", 400)
+    if not data.get("title") or not data.get("content"):
+        return error_response("Title and Content required", 400) 
 
-    post = db.session.get(Post, post_id)
+    post, error = post_service.update_post(post_id, user_id, data)
 
-    if not post:
-        abort(404)
+    if error == "not_found":
+        return error_response("Post not found", 404)
 
-    if post.author_id != user_id:
-        abort(403)
-
-    if "title" in data:
-        post.title = data["title"]
-
-    if "content" in data:
-        post.content = data["content"]
-
-    db.session.commit()
+    if error == "forbidden":
+        return error_response("Unauthorized", 403)
 
     return success_response(
         message = "Post updated",
@@ -193,19 +181,22 @@ def update_post(post_id):
 @post_bp.route("/posts/<int:post_id>", methods=["DELETE"])
 @jwt_required()
 def delete_post(post_id):
-    user_id = int(get_jwt_identity())
+    try:
+        user_id = int(get_jwt_identity())
 
-    post = db.session.get(Post, post_id)
+        error = post_service.delete_post(post_id, user_id)
 
-    if not post:
-        abort(404)
+        if error == "not_found":
+            return error_response("Post not found", 404)
 
-    if post.author_id != user_id:
-        abort(403)
+        if error == "forbidden":
+            return error_response("Unauthorized", 403)
 
-    db.session.delete(post)
-    db.session.commit()
-
-    return success_response(
-        message =  "Post deleted"
-    )
+        return success_response(
+            message = "Post deleted",
+            data={"post_id" : post_id}    
+        )
+    except Exception as e:
+        print("DELETE ERROR:", e)
+        return error_response("Internal server error", 500)
+    

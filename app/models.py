@@ -1,6 +1,5 @@
-from database import db
 from datetime import datetime
-from extensions import db
+from app.extensions import db
 
 class User(db.Model):
     __tablename__ = "users"
@@ -28,6 +27,8 @@ class Post(db.Model):
     comments = db.relationship("Comment", backref="post", lazy=True)
     likes = db.relationship("Like", backref="post", lazy=True)
 
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -52,7 +53,7 @@ class Comment(db.Model):
             "text": self.text,
             "user_id": self.user_id,
             "post_id": self.post_id
-        }
+        } 
 
 class Like(db.Model):
     __tablename__ = "likes"

@@ -1,8 +1,8 @@
 from flask import Blueprint, request, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import Comment, Post
-from extensions import db
-from utils.responses import error_response, success_response
+from app.models import Comment, Post
+from app.extensions import db
+from app.utils.responses import error_response, success_response
 
 comment_bp = Blueprint("comments", __name__)
 
@@ -36,8 +36,9 @@ def add_comment(post_id):
 
     return success_response(
         message="Comment added successfully",
-        data=new_comment.to_dict()
-    ), 201
+        data=new_comment.to_dict(),
+        status_code=201
+    )
 
 # GET COMMENTS FOR POST
 @comment_bp.route("/posts/<int:post_id>/comments", methods=["GET"])

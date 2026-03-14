@@ -1,7 +1,7 @@
 from flask import Blueprint, request, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import db, User
-from utils.responses import error_response, success_response
+from app.models import db, User
+from app.utils.responses import error_response, success_response
 
 user_bp = Blueprint("user_bp", __name__)
 

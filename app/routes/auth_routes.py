@@ -6,15 +6,16 @@ from flask_jwt_extended import (
     create_refresh_token
 )
 from flask import Blueprint, request, abort
-from models import User, TokenBlockList
-from extensions import db, bcrypt
+from app.models import User, TokenBlockList
+from app.extensions import db, bcrypt, limiter
 from datetime import datetime
-from utils.responses import error_response, success_response
+from app.utils.responses import error_response, success_response
 
 auth_bp = Blueprint("auth", __name__)
 
 # REGISTER
 @auth_bp.route("/register", methods=["POST"])
+@limiter.limit("3 per minute")
 def register():
     data = request.get_json(force=True)
 
@@ -49,11 +50,12 @@ def register():
 
     db.session.add(new_user)
     db.session.commit()
-    return success_response("User created", 201)
+    return success_response("User created", status_code=201)
 
 
 # LOGIN
 @auth_bp.route("/login", methods=["POST"])
+@limiter.limit("5 per minute")
 def login():
     data = request.get_json()
 
@@ -75,8 +77,9 @@ def login():
     return success_response(
         message="Login successful",
         data={
-            "access token": access_token,
-            "refresh_token": refresh_token
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "user_id": user.id
         }
     )
 
@@ -120,12 +123,12 @@ def get_me():
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     new_access_token = create_access_token(identity=user_id)
 
-    return success_response({
-        "access_token": new_access_token
-    })
+    return success_response(
+        data={"access_token": new_access_token}
+    )
 
 # CHANGE PASSWORD
 @auth_bp.route("/change-password", methods=["PUT"])
