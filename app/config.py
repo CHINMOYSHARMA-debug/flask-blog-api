@@ -2,7 +2,7 @@ import os
 from datetime import timedelta
 
 class Config:
-    RATELIMIT_STORAGE_URI = os.getenv("REDIS_URL", "redis://redis:6379")
+    RATELIMIT_STORAGE_URI = os.getenv("REDIS_URL")
 
     JWT_SECRET_KEY = "super-secret-key-with-atleast-long-characters-like-ABCDE56789"
     
