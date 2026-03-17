@@ -11,5 +11,5 @@ COPY . .
 
 EXPOSE 5000
 
-CMD [sh, -c, "flask db upgrade && gunicorn -b 0.0.0.0:5000 run:app"]
+CMD [sh, -c, "flask db upgrade && gunicorn -b 0.0.0.0:$PORT run:app"]
 
