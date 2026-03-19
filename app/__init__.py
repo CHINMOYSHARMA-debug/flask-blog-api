@@ -29,7 +29,12 @@ def create_app():
     app.config.from_object(Config)
     app.logger.handlers = logger.handlers
     app.logger.setLevel(logger.level)
-    
+    CORS(
+        app,
+        resources={r"/*": {"origins": "http://localhost:5173"}},
+        supports_credentials=True
+    )
+
     env = os.getenv("FLASK_ENV", "development")
 
     if env == "production":

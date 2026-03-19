@@ -52,7 +52,6 @@ def register():
     db.session.commit()
     return success_response("User created", status_code=201)
 
-
 # LOGIN
 @auth_bp.route("/login", methods=["POST"])
 @limiter.limit("5 per minute")
@@ -65,6 +64,7 @@ def login():
         return error_response("Username is required", 400)
     if not data.get("password"):
         return error_response("Password is required", 400)
+
 
     user = User.query.filter_by(username=data["username"]).first()
 
