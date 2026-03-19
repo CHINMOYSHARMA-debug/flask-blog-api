@@ -6,6 +6,7 @@ export default function Register() {
         
         username: "",
         password: "",
+        email: "",
     });
 
     const handleSubmit = async (e) => {
@@ -21,11 +22,18 @@ export default function Register() {
         <div>
             <h2>Register</h2>
 
-            <form onsubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
                 <input
                     placeholder="Username"
                     onChange={(e) =>
                         setForm({ ...form, username: e.target.value })
+                    }
+                />
+
+                <input
+                    placeholder="Email"
+                    onChange={(e) =>
+                        setForm({ ...form, email: e.target.value})
                     }
                 />
 

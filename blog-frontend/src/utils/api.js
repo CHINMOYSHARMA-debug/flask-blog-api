@@ -18,7 +18,7 @@ export const loginUser = async (data) => {
     return res.json();
 };
 
-export const getPosts = async (data) => {
+export const getPosts = async (token) => {
     const res = await fetch(`${API_URL}/posts`, {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -27,7 +27,7 @@ export const getPosts = async (data) => {
     return res.json();
 };
 
-export const createpost = async (token, data) => {
+export const createPost = async (token, data) => {
     const res = await fetch(`${API_URL}/posts`, {
         method: "POST",
         headers: {

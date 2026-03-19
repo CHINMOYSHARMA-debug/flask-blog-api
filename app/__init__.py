@@ -31,8 +31,10 @@ def create_app():
     app.logger.setLevel(logger.level)
     CORS(
         app,
-        resources={r"/*": {"origins": "http://localhost:5173"}},
-        supports_credentials=True
+        resources={r"/*": {"origins": "*"}},
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     )
 
     env = os.getenv("FLASK_ENV", "development")

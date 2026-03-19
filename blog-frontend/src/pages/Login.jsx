@@ -13,8 +13,15 @@ export default function Login() {
         const res = await loginUser(form);
         console.log(res);
 
-        localStorage.setItem("token", res.access_token);
-        alert("Login Successful");
+        if (res.success) {
+            const token = res.data.access_token;
+
+            localStorage.setItem("token", token);
+            
+            alert("Login Successful") 
+        } else {
+            alert(res.error || "Login failed");
+        }
     };
 
     return (
